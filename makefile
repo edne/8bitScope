@@ -1,5 +1,7 @@
 gl=-lGL -lglut
 
-all:
-	gcc -Wall -pthread 8bitScope.c -o8bitScope -lm $(gl)
+test: build
 	jack-stdout -b8 0 1 | ./8bitScope
+
+build:
+	gcc -Wall -pthread 8bitScope.c -o8bitScope -lm $(gl)

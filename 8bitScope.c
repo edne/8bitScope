@@ -20,15 +20,15 @@ uchar buffer[BUF_SIZE];
 
 static void *loop(void *v)
 {
-	int buf_count=0;
+    int buf_count=0;
 
-	while(1)
-	{
-		scanf("%c", &(buffer[buf_count]) );
-		//printf("%c", buffer[buf_count] );
-		buf_count++;
-		buf_count%=BUF_SIZE;
-	}
+    while(1)
+    {
+        scanf("%c", &(buffer[buf_count]) );
+        //printf("%c", buffer[buf_count] );
+        buf_count++;
+        buf_count%=BUF_SIZE;
+    }
 
     return NULL;
 }
@@ -49,19 +49,7 @@ void display()
     double c;
 
     glClear(GL_COLOR_BUFFER_BIT);
-
-    /*
-    int x,y;
-    for(x=0; x<W; x++)
-    for(y=0; y<H; y++)
-    {
-        c = (double)buffer[y*W + x]/0xFF;
-        glColor3f(c, c, c);
-
-        quad(x,y);
-    }
-    //*/
-    //*
+    
     int r,i;
     for(r=0; r<=W/2; r++)
     {
@@ -76,36 +64,34 @@ void display()
             quad( H/2 - r + i, W/2 - r);
         }
     }
-    //*/
-    
 
-	glutSwapBuffers();
-	glutPostRedisplay();
+    glutSwapBuffers();
+    glutPostRedisplay();
 }
 
 void reshape(int w, int h)
 {
-	glViewport(0, 0, w, h);
+    glViewport(0, 0, w, h);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
-	glTranslatef(-1, 1, 0);
-	glScalef(2.0/W, -2.0/H, 1);
+    glTranslatef(-1, 1, 0);
+    glScalef(2.0/W, -2.0/H, 1);
 }
 
 int fullscreen = 0;
 void special(int key, int x, int y)
 {
-	if(key==GLUT_KEY_F11)
-	{
-		if(fullscreen)
-    		glutReshapeWindow(W,H);
-		else
-		    glutFullScreen();
-		
-		fullscreen = !fullscreen;
-	}
+    if(key==GLUT_KEY_F11)
+    {
+        if(fullscreen)
+            glutReshapeWindow(W,H);
+        else
+            glutFullScreen();
+        
+        fullscreen = !fullscreen;
+    }
 }
 
 int main(int argc, char **argv)
@@ -114,15 +100,16 @@ int main(int argc, char **argv)
     pthread_create(&thread_id, NULL, loop, 0);
 
     glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutInitWindowSize(W, H);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+    glutInitWindowSize(W, H);
 
     glutCreateWindow("8bitScope");
-	glutDisplayFunc(display);
-	glutReshapeFunc(reshape);
-	glutSpecialFunc(special);
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutSpecialFunc(special);
 
     glutMainLoop();
 
-	return 0;
+    return 0;
 }
+
