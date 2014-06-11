@@ -18,6 +18,8 @@ typedef unsigned char uchar;
 double f;
 uchar buffer[BUF_SIZE];
 
+int RGB;
+
 static void *loop(void *v)
 {
     int buf_count=0;
@@ -46,8 +48,6 @@ void quad(double x, double y)
 
 void display()
 {
-    double c;
-
     glClear(GL_COLOR_BUFFER_BIT);
     
     int r,i;
@@ -55,8 +55,19 @@ void display()
     {
         for(i=0; i<r*2+1; i++)
         {
-            c = (double)buffer[r*(W/2)+i]/0xFF;
-            glColor3f(c, c, c);
+            if(RGB)
+            {
+                double cr,cg,cb;
+                cr = (double)buffer[r*(W/2)+i]/0xFF;
+                cg = (double)buffer[r*(W/2)+i +W]/0xFF;
+                cb = (double)buffer[r*(W/2)+i +2*W]/0xFF;
+                glColor3f(cr, cg, cb);
+            }
+            else
+            {
+                double c = (double)buffer[r*(W/2)+i]/0xFF;
+                glColor3f(c, c, c);
+            }
             
             quad( H/2 + r, W/2 - r + i);
             quad( H/2 - r, W/2 - r + i);
@@ -96,6 +107,10 @@ void special(int key, int x, int y)
 
 int main(int argc, char **argv)
 {
+    RGB=0;
+    if(argc>1)
+         RGB = !strncmp(argv[1], "--rgb", strlen("--rgb"));
+    
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, loop, 0);
 
