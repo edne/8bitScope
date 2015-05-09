@@ -11,10 +11,11 @@ typedef unsigned char uchar;
 
 
 //-- PROTOTYPES
-void grey(int, int);
+void mono(int, int);
 void rgb(int, int);
 
 void concentric();
+void vertical();
 //--
 
 
@@ -28,15 +29,15 @@ uchar _BUFFER[W*H];
 #define BUFFER(i) (double) _BUFFER[i % (W*H)] / 0xFF
 
 void (*_color_modes[])(int, int) = {
-   *grey, *rgb
+   *mono, *rgb
 };
 
 void (*_drawing_modes[])() = {
-   *concentric
+   *concentric, *vertical
 };
 
 int color_mode = 1;
-int drawing_mode = 0;
+int drawing_mode = 1;
 
 #define COLOR(x, y) (*   _color_modes[color_mode]   )(x, y)
 #define DRAW()      (* _drawing_modes[drawing_mode] )()
@@ -73,15 +74,13 @@ static void *loop(void *v)
 
 void rgb(int x, int y)
 {
-    double cr,cg,cb;
-    cr = BUFFER(x*(W/2) + y);
-    cg = BUFFER(x*(W/2) + y +W);
-    cb = BUFFER(x*(W/2) + y +2*W);
-    glColor3f(cr, cg, cb);
+    glColor3f(BUFFER(x*(W/2) + y),
+	      BUFFER(x*(W/2) + y +W),
+	      BUFFER(x*(W/2) + y +2*W));
 }
 
 
-void grey(int x, int y)
+void mono(int x, int y)
 {
     double c = BUFFER(x*(W/2) + y);
     glColor3f(c, c, c);
@@ -101,6 +100,22 @@ void concentric()
             quad( H/2 - r, W/2 - r + i);
             quad( H/2 - r + i, W/2 + r);
             quad( H/2 - r + i, W/2 - r);
+        }
+    }
+}
+
+
+void vertical()
+{
+    int x, y;
+    for(x=0; x<W/2; x++)
+    {
+        for(y=0; y<H; y++)
+        {
+            COLOR(x, y);
+
+            quad(x, y);
+            quad(W-1-x, y);
         }
     }
 }
