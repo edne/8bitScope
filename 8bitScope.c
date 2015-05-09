@@ -10,18 +10,22 @@
 typedef unsigned char uchar;
 
 
-// PROTOTYPES
+//-- PROTOTYPES
 void grey(int, int);
 void rgb(int, int);
 
 void concentric();
-//
+//--
 
 
-// GLOBALS
+//-- WHITE MAGIC
 #define W 64
 #define H 64
-uchar BUFFER[W*H];
+
+uchar _BUFFER[W*H];
+
+// getter
+#define BUFFER(i) (double) _BUFFER[i % (W*H)] / 0xFF
 
 void (*_color_modes[])(int, int) = {
    *grey, *rgb
@@ -36,10 +40,10 @@ int drawing_mode = 0;
 
 #define COLOR(x, y) (*   _color_modes[color_mode]   )(x, y)
 #define DRAW()      (* _drawing_modes[drawing_mode] )()
-//
+//--
 
 
-// PRIMITIVES
+//-- PRIMITIVES
 void quad(double x, double y)
 {
     #define DV(dx, dy) glVertex2f(x + dx,\
@@ -49,7 +53,7 @@ void quad(double x, double y)
     DV(1,1); DV(0,1);
     glEnd();
 }
-//
+//--
 
 
 static void *loop(void *v)
@@ -57,8 +61,8 @@ static void *loop(void *v)
     int i = 0;
     while(1)
     {
-        scanf("%c", &(BUFFER[i]) );
-        //printf("%c", BUFFER[buf_count] );
+        scanf("%c", &(_BUFFER[i]) );
+        //printf("%c", _BUFFER[buf_count] );
         i++;
         i %= W*H;
     }
@@ -70,16 +74,16 @@ static void *loop(void *v)
 void rgb(int x, int y)
 {
     double cr,cg,cb;
-    cr = (double)BUFFER[x*(W/2)+y]/0xFF;
-    cg = (double)BUFFER[x*(W/2)+y +W]/0xFF;
-    cb = (double)BUFFER[x*(W/2)+y +2*W]/0xFF;
+    cr = BUFFER(x*(W/2) + y);
+    cg = BUFFER(x*(W/2) + y +W);
+    cb = BUFFER(x*(W/2) + y +2*W);
     glColor3f(cr, cg, cb);
 }
 
 
 void grey(int x, int y)
 {
-    double c = (double)BUFFER[x*(W/2)+y]/0xFF;
+    double c = BUFFER(x*(W/2) + y);
     glColor3f(c, c, c);
 }
 
