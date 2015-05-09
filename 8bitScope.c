@@ -1,84 +1,107 @@
 #include <GL/freeglut.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <pthread.h>
 
-#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
-#include <time.h>
 
-#define W 64
-#define H 64
-#define BUF_SIZE W*H
 
 typedef unsigned char uchar;
 
-double f;
-uchar buffer[BUF_SIZE];
 
-int RGB;
+// PROTOTYPES
+void grey(int, int);
+void rgb(int, int);
+
+void concentric();
+//
+
+
+// GLOBALS
+#define W 64
+#define H 64
+uchar BUFFER[800*600];  // more memory!
+
+void (*color_func)(int, int) = *rgb;
+void (*drawing_func)(int, int) = *concentric;
+//
+
+
+// PRIMITIVES
+void quad(double x, double y)
+{
+    glBegin(GL_POLYGON);
+    glVertex2f(x+0, y+0);
+    glVertex2f(x+1, y+0);
+    glVertex2f(x+1, y+1);
+    glVertex2f(x+0, y+1);
+    glVertex2f(x+0, y+0);
+    glEnd();
+}
+//
+
 
 static void *loop(void *v)
 {
-    int buf_count=0;
-
+    int i = 0;
     while(1)
     {
-        scanf("%c", &(buffer[buf_count]) );
-        //printf("%c", buffer[buf_count] );
-        buf_count++;
-        buf_count%=BUF_SIZE;
+        scanf("%c", &(BUFFER[i]) );
+        //printf("%c", BUFFER[buf_count] );
+        i++;
+        i %= W*H;
     }
 
     return NULL;
 }
 
-void quad(double x, double y)
+
+void rgb(int x, int y)
 {
-    glBegin(GL_POLYGON);
-    glVertex2f(x+0,y+0);
-    glVertex2f(x+1,y+0);
-    glVertex2f(x+1,y+1);
-    glVertex2f(x+0,y+1);
-    glVertex2f(x+0,y+0);
-    glEnd();
+    double cr,cg,cb;
+    cr = (double)BUFFER[x*(W/2)+y]/0xFF;
+    cg = (double)BUFFER[x*(W/2)+y +W]/0xFF;
+    cb = (double)BUFFER[x*(W/2)+y +2*W]/0xFF;
+    glColor3f(cr, cg, cb);
 }
 
-void display()
+
+void grey(int x, int y)
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    int r,i;
+    double c = (double)BUFFER[x*(W/2)+y]/0xFF;
+    glColor3f(c, c, c);
+}
+
+
+void concentric()
+{
+    int r, i;
     for(r=0; r<=W/2; r++)
     {
         for(i=0; i<r*2+1; i++)
         {
-            if(RGB)
-            {
-                double cr,cg,cb;
-                cr = (double)buffer[r*(W/2)+i]/0xFF;
-                cg = (double)buffer[r*(W/2)+i +W]/0xFF;
-                cb = (double)buffer[r*(W/2)+i +2*W]/0xFF;
-                glColor3f(cr, cg, cb);
-            }
-            else
-            {
-                double c = (double)buffer[r*(W/2)+i]/0xFF;
-                glColor3f(c, c, c);
-            }
-            
+            (*color_func)(r, i);
+
             quad( H/2 + r, W/2 - r + i);
             quad( H/2 - r, W/2 - r + i);
             quad( H/2 - r + i, W/2 + r);
             quad( H/2 - r + i, W/2 - r);
         }
     }
+}
+
+
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    concentric();
 
     glutSwapBuffers();
     glutPostRedisplay();
 }
+
 
 void reshape(int w, int h)
 {
@@ -91,26 +114,24 @@ void reshape(int w, int h)
     glScalef(2.0/W, -2.0/H, 1);
 }
 
-int fullscreen = 0;
+
 void special(int key, int x, int y)
 {
+    static int fullscreen = 0;
     if(key==GLUT_KEY_F11)
     {
         if(fullscreen)
             glutReshapeWindow(W,H);
         else
             glutFullScreen();
-        
+
         fullscreen = !fullscreen;
     }
 }
 
+
 int main(int argc, char **argv)
 {
-    RGB=0;
-    if(argc>1)
-         RGB = !strncmp(argv[1], "--rgb", strlen("--rgb"));
-    
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, loop, 0);
 
@@ -127,4 +148,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
