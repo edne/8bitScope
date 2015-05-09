@@ -21,22 +21,32 @@ void concentric();
 // GLOBALS
 #define W 64
 #define H 64
-uchar BUFFER[800*600];  // more memory!
+uchar BUFFER[W*H];
 
-void (*color_func)(int, int) = *rgb;
-void (*drawing_func)(int, int) = *concentric;
+void (*_color_modes[])(int, int) = {
+   *grey, *rgb
+};
+
+void (*_drawing_modes[])() = {
+   *concentric
+};
+
+int color_mode = 1;
+int drawing_mode = 0;
+
+#define COLOR(x, y) (*   _color_modes[color_mode]   )(x, y)
+#define DRAW()      (* _drawing_modes[drawing_mode] )()
 //
 
 
 // PRIMITIVES
 void quad(double x, double y)
 {
+    #define DV(dx, dy) glVertex2f(x + dx,\
+				  y + dy);
     glBegin(GL_POLYGON);
-    glVertex2f(x+0, y+0);
-    glVertex2f(x+1, y+0);
-    glVertex2f(x+1, y+1);
-    glVertex2f(x+0, y+1);
-    glVertex2f(x+0, y+0);
+    DV(0,0); DV(1,0);
+    DV(1,1); DV(0,1);
     glEnd();
 }
 //
@@ -81,7 +91,7 @@ void concentric()
     {
         for(i=0; i<r*2+1; i++)
         {
-            (*color_func)(r, i);
+            COLOR(r, i);
 
             quad( H/2 + r, W/2 - r + i);
             quad( H/2 - r, W/2 - r + i);
@@ -96,7 +106,7 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    concentric();
+    DRAW();
 
     glutSwapBuffers();
     glutPostRedisplay();
