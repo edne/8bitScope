@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 
 typedef unsigned char uchar;
@@ -38,6 +39,7 @@ void (*_drawing_modes[])() = {
 
 enum {
     COLOR_index,
+    GREYSCALE_index,
     DRAWING_index,
     SEPARE_index
 };
@@ -50,11 +52,29 @@ int options[] = {0, 0, 0};
 #define GW color_weights[1]
 #define BW color_weights[2]
 
+#define GREYSCALE options[GREYSCALE_index]
+
 #define COLOR(x, y) (*   _color_modes[ options[COLOR_index]   ] )(x, y)
 #define DRAW()      (* _drawing_modes[ options[DRAWING_index] ] )()
 
 #define SEPARE options[SEPARE_index]
 //--
+
+
+void init_options()
+{
+    RW=1; GW=1; BW=1;
+    if(!GREYSCALE)
+    {
+        // color_weights[rand()%3] = 0;
+	if(rand()%2)
+            color_weights[rand()%3] = rand() / RAND_MAX;
+    }
+
+    int i;
+    for(i=0; i<4; i++)
+        options[i] = rand() % 2;
+}
 
 
 //-- PRIMITIVES
@@ -179,6 +199,9 @@ int main(int argc, char **argv)
 {
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, loop, 0);
+
+    srand(time(NULL));
+    init_options();
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
