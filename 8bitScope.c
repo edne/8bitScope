@@ -36,13 +36,24 @@ void (*_drawing_modes[])() = {
    *concentric, *vertical
 };
 
-int color_mode = 1;
-int drawing_mode = 1;
+enum {
+    COLOR_index,
+    DRAWING_index,
+    SEPARE_index
+};
 
-#define COLOR(x, y) (*   _color_modes[color_mode]   )(x, y)
-#define DRAW()      (* _drawing_modes[drawing_mode] )()
+double color_weights[] = {1, 1, 1};
+int options[] = {0, 0, 0};
 
-#define SEPARE 1
+
+#define RW color_weights[0]
+#define GW color_weights[1]
+#define BW color_weights[2]
+
+#define COLOR(x, y) (*   _color_modes[ options[COLOR_index]   ] )(x, y)
+#define DRAW()      (* _drawing_modes[ options[DRAWING_index] ] )()
+
+#define SEPARE options[SEPARE_index]
 //--
 
 
@@ -76,16 +87,16 @@ static void *loop(void *v)
 
 void rgb(int x, int y)
 {
-    glColor3f(BUFFER(x*(W/2) + y),
-	      BUFFER(x*(W/2) + y +W),
-	      BUFFER(x*(W/2) + y +2*W));
+    glColor3f(RW * (BUFFER(x*(W/2) + y)),
+	      GW * (BUFFER(x*(W/2) + y +W)),
+	      BW * (BUFFER(x*(W/2) + y +2*W)));
 }
 
 
 void mono(int x, int y)
 {
     double c = BUFFER(x*(W/2) + y);
-    glColor3f(c, c, c);
+    glColor3f(RW*c, GW*c, BW*c);
 }
 
 
