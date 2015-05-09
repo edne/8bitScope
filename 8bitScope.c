@@ -41,6 +41,8 @@ int drawing_mode = 1;
 
 #define COLOR(x, y) (*   _color_modes[color_mode]   )(x, y)
 #define DRAW()      (* _drawing_modes[drawing_mode] )()
+
+#define SEPARE 1
 //--
 
 
@@ -89,17 +91,18 @@ void mono(int x, int y)
 
 void concentric()
 {
-    int r, i;
+    int r, _r, i;
     for(r=0; r<=W/2; r++)
     {
         for(i=0; i<r*2+1; i++)
         {
             COLOR(r, i);
 
-            quad( H/2 + r, W/2 - r + i);
-            quad( H/2 - r, W/2 - r + i);
-            quad( H/2 - r + i, W/2 + r);
-            quad( H/2 - r + i, W/2 - r);
+	    _r = r + SEPARE * BUFFER(r)*W/2;
+            quad( H/2 + _r, W/2 - r + i);
+            quad( H/2 - _r, W/2 - r + i);
+            quad( H/2 - r + i, W/2 + _r);
+            quad( H/2 - r + i, W/2 - _r);
         }
     }
 }
@@ -107,18 +110,20 @@ void concentric()
 
 void vertical()
 {
-    int x, y;
-    for(x=0; x<W/2; x++)
+    int x, _x , y;
+    for(x=0; x<W; x++)
     {
         for(y=0; y<H; y++)
         {
             COLOR(x, y);
 
-            quad(x, y);
-            quad(W-1-x, y);
+	    _x = x + SEPARE * BUFFER(x)*W;
+            quad(_x, y);
+            quad(W-1- _x, y);
         }
     }
 }
+
 
 
 void display()
