@@ -69,7 +69,7 @@ void init_options()
     if(!GREYSCALE)
     {
         // color_weights[rand()%3] = 0;
-	if(rand()%2)
+        if(rand()%2)
             color_weights[rand()%3] = rand() / RAND_MAX;
     }
 
@@ -83,7 +83,7 @@ void init_options()
 void quad(double x, double y)
 {
     #define DV(dx, dy) glVertex2f(x + dx,\
-				  y + dy);
+                                  y + dy);
     glBegin(GL_POLYGON);
     DV(0,0); DV(1,0);
     DV(1,1); DV(0,1);
@@ -110,8 +110,8 @@ static void *loop(void *v)
 void rgb(int x, int y)
 {
     glColor3f(RW * (BUFFER(x*(W/2) + y)),
-	      GW * (BUFFER(x*(W/2) + y +W)),
-	      BW * (BUFFER(x*(W/2) + y +2*W)));
+              GW * (BUFFER(x*(W/2) + y +W)),
+              BW * (BUFFER(x*(W/2) + y +2*W)));
 }
 
 
@@ -131,7 +131,7 @@ void concentric()
         {
             COLOR(r, i);
 
-	    _r = r + SEPARE * BUFFER(r)*W/2;
+            _r = r + SEPARE * BUFFER(r)*W/2;
             quad( H/2 + _r, W/2 - r + i);
             quad( H/2 - _r, W/2 - r + i);
             quad( H/2 - r + i, W/2 + _r);
@@ -150,7 +150,7 @@ void vertical()
         {
             COLOR(x, y);
 
-	    _x = x + SEPARE * BUFFER(x)*W;
+            _x = x + SEPARE * BUFFER(x)*W;
             quad(_x, y);
             quad(W-1- _x, y);
         }
