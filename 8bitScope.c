@@ -7,6 +7,8 @@
 #include <math.h>
 #include <time.h>
 
+#include <time.h>
+
 
 typedef unsigned char uchar;
 
@@ -165,6 +167,10 @@ void display()
 
     glutSwapBuffers();
     glutPostRedisplay();
+
+    if(rand() % 180 == 0) {
+      init_options();
+    }
 }
 
 
